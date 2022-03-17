@@ -1,0 +1,303 @@
+MYSQL
+
+show databases - shows all the databases created
+create database databasename - to create database  
+Use databasename - to use the database or create the table under the specific database
+Show tables - shows the tables in the database that is being used
+Drop database databasename -  to delete the database
+
+Data types:
+
+Numeric types:
+INT - whole numbers (+ve & -ve)
+
+FLOAT (M,D) (M - no. of numbers in total, D - no.of numbers at decimal place) — decimal numbers (approx)
+Ex: FLOAT (3,2) 0.567 = accepted it will be rounded to 0.57
+
+DECIMAL (M,D) - decimal number (precise)
+Ex: DECIMAL (3,2) 0.567 = not accepted
+
+Non-Numeric types:
+CHAR (N) = fixed length characters
+
+VARCHAR(N) = varying length character accepting a character of length upto N
+
+ENUM(‘M’,’F’) = value from predefined set
+
+BOOLEAN = true/false
+
+Date and time types:
+Date (YYYY-MM-DD)
+Datetime (YYYY-MM-DD HH-MM-SS)
+Time (HH-MM-SS)
+Year (YYYY)
+
+Primary and Foreign keys:
+Primary key is column or set of columns which uniquely identifies the record within the table.
+One table can only have one primary key, it cannot be null. Table with primary key is called the parent table/ reference table.
+
+Foreign key is used to link two tables together. It is a value which matches the values of the primary key another table.Table with foreign key is called child table. There can be multiple foreign keys in a table.
+
+Example:
+
+create table products(
+id INT AUTO_INCREMENT PRIMARY KEY,
+name VARCHAR(30),
+price DECIMAL(3,2)
+);
+
+create table customers(
+id INT AUTO_INCREMENT PRIMARY KEY,
+firstname VARCHAR(15),
+lastname VARCHAR(15),
+gender ENUM('M','F'),
+contact VARCHAR(10)
+);
+
+create table orders(
+id INT AUTO_INCREMENT PRIMARY KEY,
+productid INT,
+customerid INT,
+ordertime DATETIME,
+FOREIGN KEY(productid) REFERENCES products(id),
+FOREIGN KEY(customerid) REFERENCES customers(id)
+);
+
+Add a column to the table:
+
+ALTER TABLE products
+ADD COLUMN coffeeorigin VARCHAR(20);
+
+Remove a column from the table:
+ALTER TABLE products
+DROP COLUMN coffeeorigin;
+
+Delete table completely: 
+DROP table products;
+
+Cant delete a table if its primary key acts as a foreign key for another table
+
+Delete all the values from the table:
+TRUNCATE TABLE products;
+
+To know details about the column
+DESCRIBE orders;
+
+Add/ remove primary key:
+
+Removing of a key is possible if it is declared as primary key only after the table creation
+Once it is made primary key the removal is not possible for null value
+
+ALTER TABLE customers
+DROP PRIMARY KEY;
+
+ALTER TABLE CUSTOMERS
+ADD PRIMARY KEY(ID);
+
+Add/remove foreign key:
+
+EX: alter table orders
+add constraint constraintname
+foreign key(customerid) references customers(id)
+
+alter table orders
+drop foreign key cons1;
+
+Add/remove unique constraint
+
+alter table products add constraint cons unique(name);
+alter table products drop index cons;
+
+Change the column name:
+
+alter table products change `oldcolumnname` `newcolumnnanme` varchar(25);
+
+Change column datatype:
+alter table products modify column name type;
+
+
+Inserting values to the table:
+insert into products(column1,column2,column3) values(value1,value2,value3)
+
+EX: insert into products(name,price,coffeeorigin) values(‘espresso’,3.45,’brazil');
+
+insert into products(name,price,coffeeorigin) values(‘espresso',3.45,'brazil'),(‘espresso’,3.45,’brazil');
+
+Updating value in a table:
+
+update products set columnname = value  where id = value;
+
+It is possible to specify where with only id because it automatically sets safe update to true.To disable that write the below code:
+set sql_safe_updates=0;
+
+Delete values from table:
+
+delete from products where name=‘filter';
+
+Delete from products; = deletes all the values from table
+
+Select statement:
+
+Select * from products; 
+Select columnname from tablename;
+Select column1, column2 from tablename;
+select * from products where price=3.00 and id=1; (and/or)
+
+Inequality operators:
+>,>=,<,<=
+
+Null values:
+select * from customers where contact is null;
+select * from customers where contact is not null;
+
+In, not in when something must be equal or not equal more than one value
+
+select * from customers where gender in (‘f');
+select * from customers where gender not in (‘f’,’m’);
+
+Between:
+select * from orders where ordertime between '2017-01-01' and ‘2017-01-07'; includes both min and max
+
+Like:
+Select * from customers where firstname like ’w%’ 
+Like mms similar to the structure specified 
+_ means one character
+% means any number of character or number can be followed
+
+Order_by:
+The table will be arranged using id, to alter it
+
+Select * from products order by price asc/desc, asc is the default order if not specified
+
+Select * from orders where customerid=1 order by ordertime asc
+
+
+
+Distinct:
+
+Select distinct origin from products;
+
+Select distinct customerid from orders where ordertime between CAST('2017-02-01' AS DATE) AND CAST('2017-02-20' AS DATE) order by customerid;
+
+Limit:
+
+Limit the number of rows selected
+
+Select * from products limit 5 (id 1 to 5)
+Select * from products limit 5 offset 5(id 6 to 10)
+
+Column name Alias:
+select name as coffee, coffeeorigin as country from products;
+It does not change the name of the column in database it is reflected only for the resultset 
+
+Selecting from multiple tables:
+
+Joins:
+It allows to retrieve data from multiple tables using single select statement
+To use joins there must be a column which makes the two tables related
+
+Inner join :
+Will retrieve data, there is matching values in both the tables
+select products.name,orders.ordertime from orders inner join products on products.id=orders.productid;
+
+select p.name,o.ordertime from orders o inner join products p on p.id=o.productid;
+
+Left join:
+Retrieve all data from left table and the matching data from the right/other table
+
+ select o.id,c.firstname,c.lastname from orders o left join customers c on o.customerid = c.id ;
+
+Right join:
+Retrieve all data from right table and the matching data from the left/other table
+
+select o.id,o.customerid ,c.firstname,c.lastname from customers c right join orders o on c.id=o.customerid order by o.id  ;
+select o.id,o.customerid,c.firstname,c.lastname from orders o right join customers c on o.customerid = c.id order by o.id;
+
+Joining more than two tables:
+
+select o.ordertime, p.name, c.firstname, c.lastname,c.contact from orders o join products p on o.productid = p.id join customers c on o.customerid = c.id order by ordertime;
+
+Database design:
+Normalization:
+
+Process of organising data efficiently in the database.To eliminate redundant data to avoid same values being stored again
+
+Advantage:
+Reduce storage space
+Improve query performance
+Reduce insert, update and deletion anomalies
+
+Levels of normalisation:
+
+1st normal form (1NF)
+2st normal form (2NF)
+3st normal form (3NF)
+Boyce and Codd normal Form(BCNF)
+
+1NF:
+No repeated rows of data
+Column only contain a single value
+Has a primary key
+
+2NF:
+1NF and every column which in not a primary key must depend on the whole of primary key
+
+3NF:
+2NF and every column which in not a primary key must depend only on the whole of primary key and not the other columns
+
+Relationships:
+Tables are related through primary and foreign keys
+
+One to one:
+Where key to enable appears no more than once as a in another table
+Ex; hod and department
+
+One to Many:
+Primary key of one table can be in multiple rows of foreign key column in another table
+Ex: customer and orders
+
+Many to many:
+Where two table can have any instances each other.
+Ex: products and orders
+
+Constraints:
+
+Not null - no null value
+Unique - no duplicates
+Primary key - uniquely identifies each row
+Foreign key - related to primary key in another table
+
+Subqueries:
+These are queries nested within other queries.It can be used within select, insert, update and delete query. The nested query can be in the where or the from (creates a derived table, it must be named, in keyword is not required).
+
+Types:
+Non-correlated - inner query can run indecently of the outer query.Inner query runs first and produces a result set, which is then used by the outer query.
+
+Correlated - dependent on each other. The inner query runs forgery town the outer query, and hence it runs multiple times
+
+select firstname from customers where id in (select customerid from orders where  id >=17)  ;
+select firstname from customers where id in (select customerid from orders where  customerid >=17 ) and firstname like 't%' ;
+
+Functions:
+
+These are stored programs which can be passed parameters and return a value.
+
+Concatenation:
+Select concat(column1, column2) as new columnname from table
+Select concat (firstname,” “, lastname) as new from customers;
+ 
+Substrings:
+Substring(string, start, length)
+
+Uppercase and lowercase:
+Select upper(column1) as new columnname from table
+Select lower(column1) as new columnname from table
+
+Date function:
+Select date(yyyy-mm-dd h-m-s)
+
+Month function:
+Select month(yyyy-mm-dd)
+
+Year function:
+Select year(yyyy-mm-dd);
