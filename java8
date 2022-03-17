@@ -1,0 +1,1367 @@
+JAVA 8
+
+Objective:
+
+To simplify the code.
+To enable the benefits of functional programming/procedure in java in the form lambda expressions.
+To enable parallel programming to utilise multicore processors.
+
+New Features:
+
+Lambda expressions
+Functional interfaces - used to call lambda expressions
+Default methods in interfaces
+Static methods in interfaces
+Predefined functional interfaces:
+Predicate
+Function
+Consumer
+Method reference and constructor reference by double colon operator (::)
+Stream API
+Date and Time API/ JODA API  (by jodi.org)
+
+ADVANTAGES: 
+
+1.enable functional programming in java
+2. Reduce the length of code and increase readability
+3.helps resolving complexity of anonymous classes to some extent
+4.can handle function/procedure like values
+Ex: intern I = () -> syso(“m implementation”);
+5.can pass function/procedure like arguments
+Ex:Thread t = new Thread( ()-> {
+		for(int i=0;i<10;i++){
+			syso(“child”);
+		}
+	}
+6.easy to updated APIs and libraries
+7.enable support fro parallel programming
+
+
+Lambda Expressions:
+ 
+The first programming language which used lambda expression is LISP.
+Enables functional programming - can pass procedure as argument.
+To write more readable, maintainable and concise code.
+To use API easily and effectively.
+To enable parallel processing.
+
+	Lambda expression is an anonymous function
+		no name
+		no modifiers
+		no return type
+
+Ex : 	() -> { System.out.println(“hello world”); }
+	(int a , int b) -> { System.out.println(a+b); }
+	(String s) -> { return s.length(); }
+
+Rules:
+
+If only one statement is there curly brackets are optional.
+Ex: () -> System.out.println(“hello world”);
+Type inference (based on content datatype can be guessed by the compiler) is possible so needn’t mention the datatypes for parameters.
+Ex: (a , b) ->  System.out.println(a+b); 
+The keyword return need not be mentioned explicitly and if only one parameter round brackets are optional.
+Ex: s -> s.length();
+
+
+2) Functional Interface:
+
+			Single Abstract Method = SAM
+
+If an interface contains only one abstract method, it is called functional interface. It is used to call/invoke lambda expressions. Restriction is applicable for only abstraction method not for other methods.
+
+Ex: 	Runnable = contains only one method: run()
+	Callable = contains only one method: call()
+	Comparable = contains only one method: compareTo()
+	ActionListener = contains only one method: actionPerformed()
+	
+Annotation:
+@FunctionalInterface
+
+Use: Mistakenly if any error created compiler will indicate the error, if the annotation is used explicitly.
+
+Case 1 : More than one abstract method:
+Error: Unexpected @FunctionalInterface annotation, multiple non-overriding abstract methods present in interface interfacename
+
+Case 2 : No abstract method:
+Error: Unexpected @FunctionalInterface annotation, no abstract method is found in interface interfacename
+
+WRT inheritance:
+Valid cases:
+
+Case 1:
+
+@FunctionalInterface
+Interface P{
+Public void m();
+}
+@FunctionalInterface
+Interface Q extendsP{
+}
+
+Case 2:
+
+@FunctionalInterface
+Interface P{
+Public void m();
+}
+@FunctionalInterface
+Interface Q extendsP{
+Public void m();
+}
+
+Case 3:
+
+@FunctionalInterface
+Interface P{
+Public void m();
+}
+Interface Q extendsP{
+Public void m2();
+}
+
+Invalid case:
+
+Case 2:
+
+@FunctionalInterface
+Interface P{
+Public void m();
+}
+@FunctionalInterface
+Interface Q extendsP{
+Public void m2();
+}
+
+Invoking lambda expression by functional interface:
+
+By using functional interface reference we can call lambda method implementation
+
+Example 1:
+
+Without lambda:
+
+Interface intern{
+Public void m():
+}
+Class C implements intern{
+Public void m(){
+syso(“m implementation”)
+}
+Class demo{
+Public void main(String[] args){
+ 	intern I = new c();
+	I.m();
+} }
+
+With lambda:
+
+
+Interface intern{
+Public void m():
+}
+Class demo{
+Public void main(String[] args){
+ 	intern I = () -> syso(“m implementation”);
+	I.m();
+} }
+
+Example 2:
+
+Without lambda:
+
+Interface intern{
+Public void add(int a, int b):
+}
+Class C implements intern{
+Public void add(){
+syso(a+b)
+}
+Class demo{
+Public void main(String[] args){
+ 	intern I = new c();
+	I.add(2,3);
+} }
+
+With lambda:
+
+
+Interface intern{
+Public void m():
+}
+Class demo{
+Public void main(String[] args){
+ 	intern I = (a,b) -> syso(a+b);
+	i.add(2,3);
+} }
+
+Example 3: invoking using predefined interfaces
+
+Without lambda
+
+Interface intern implements Runnable{
+Public void run (){
+	//job of thread
+	for(int i=0;i<10;i++){
+		syso(“child”);
+	}
+}
+}
+Class Demo{
+Public static void main(String[] args){
+	Runnable r = new intern();
+	Thread t = new Thread(r);
+	r.start();
+	for(int i=0;i<10;i++){
+		syso(“main");
+	}
+}
+}
+
+With lambda:
+Class Demo{
+Public static void main(String[] args){
+	Runnable r = ()->{
+		for(int i=0;i<10;i++){
+			syso(“child”);
+		}
+	};
+	Thread t = new Thread(r);
+	t.start();
+	for(int i=0;i<10;i++){
+		syso(“main");
+	}
+}
+}
+
+Functional interface should contain only one abstract method, why?
+It acts as the type for lambda expression.
+
+Interface interef{
+	Public void m(int a):
+}
+
+interef I = a -> syso(a*a);
+I.m(2); 
+
+a -> syso(a*a);
+The above is the implementation of m method if there are two or more abstract methods then the type inference will be doubtful what might be the method which is to be implemented because compiler is not able to understand which method is to be mapped.
+
+What is the adv of annotation?
+To explicitly specify that the interface is used to invoke lambda expression.
+
+Lambda expression with Collections:
+
+Comparator interface can be used with lambda expression because it contains only one method compare()
+
+Comparator = customised comparison, requires two objects, return type of compare method is int.
+
+Arraylist:
+
+Without lambda:
+
+ArrayList<Integer> l = new ArrayList<Integer>()
+l.add(10)
+l.add(0)
+l.add(15)
+l.add(20)
+l.add(5)
+//Collections.sort(l) = default natural sorting order
+Collections.sort(l, new mycomp());
+ 
+Class mycomp implements Comparator<Integer>{
+Public int compare(Integer i1, Integer i2){
+	if(i1>i2){
+		return -1;
+	}
+	else if(i1<i2){
+		return 1;
+	}
+	else{
+		return 0;
+	}
+
+		(or)
+
+return i1>i2?-1: i1<i1? 1:0; 
+}
+}
+
+With lambda:
+ArrayList<Integer> l = new ArrayList<Integer>()
+l.add(10)
+l.add(0)
+l.add(15)
+l.add(20)
+l.add(5)
+Collections.sort(l, (a1,a2)->(a1>a2)?-1:(a1<a2)?1:0);
+
+
+
+Set:
+If one should perform sorting with sets they must go with treest.
+
+treeset<Integer> ts = new treeset<Integer>() => default natural sorting order
+
+treeset<Integer> ts = new treeset<Integer>((a1,a2) -> (a1>a2)?-1:(a1<a2)?1:0)
+
+
+TreeMap:
+treemap<Integer,String> ts = new treemap<Integer,String>() => default natural sorting order of 											keys
+
+treemap<Integer,String> ts = new treemap<Integer,String>((a1,a2) -> (a1>a2)?-1:(a1<a2)?1:0)
+
+Sorting for customised class objects:
+
+Class Employee{
+	private int id;
+	private String name; 
+	Employee(int id, String name){
+		this.id = id;
+		this.name = name;
+	}
+	public String toString(){
+		return id+” :  “ +name; 
+	}
+}
+
+
+Employee emp1 = new Employee(100, “geethu”)
+syso(emp1);
+
+Ex 1:
+Arraylist<Employee> emp = new Arraylist<Employee>();
+
+emp.add(100,”Geetha”)
+emp.add(200,”kumar”)
+emp.add(300,”sangee”)
+
+Collections.sort((e1,e2)-> (e1.id<e2.id)?-1:(e1.id>e2.id)?1:0)
+
+Anonymous Inner Classes:
+
+Only a few of the anonymous inner classes can be replaced with lambda expression 
+
+Runnable r = new Runnable() = invalid Compile time error
+
+A class is implemented for the interface with no name and an object is created for it
+Runnable r = new Runnable()
+{
+Public void run(){
+}
+}
+
+Ex:
+With Inner Class:
+
+Class Demo{
+Public static void main(String[] args){
+	Runnable r = new Runnable()
+	{
+		public void run(){
+			for(int i=0;i<10;i++){
+				syso(“child”);
+			}
+		}
+	};
+	Thread t = new Thread(r);
+	t.start();
+	for(int i=0;i<10;i++){
+		syso(“main");
+	}
+}
+}
+
+With lambda:
+
+Class Demo{
+Public static void main(String[] args){
+	Runnable r = ()->{
+		for(int i=0;i<10;i++){
+			syso(“child”);
+		}
+	};
+	Thread t = new Thread(r);
+
+			or
+
+	Thread t = new Thread( ()-> {
+		for(int i=0;i<10;i++){
+			syso(“child”);
+		}
+	}
+
+	t.start();
+	for(int i=0;i<10;i++){
+		syso(“main");
+	}
+}
+}
+
+Invalid for lambdA
+
+Class Test{
+}
+//Anonymous inner class that extends concrete class
+Test t = new Test()
+{}
+
+Abstract Class Test{
+}
+//Anonymous inner class that extends abstract class
+Test t = new Test()
+{}
+
+Interface Test{
+Public void m1();
+Public void m2();
+Public void m3();
+}
+//Anonymous inner class that implements interface with multiple methods
+Test t = new Test()
+{
+Public void m1(){};
+Public void m2(){};
+Public void m3(){};
+}
+
+Valid for lambdA
+
+Interface Test{
+Public void m1();
+}
+//Anonymous inner class that implements interface with one method
+Test t = new Test()
+{
+Public void m1(){};
+}
+Or
+
+Test t =()->{}
+
+
+WRT ‘this’:
+
+Interface Interef{
+Public void m1();
+}
+Class Test{
+Int x=8;
+Public void m2(){
+	Interef I = new Interef()
+	{
+		int x = 9;//instance varaiable
+		Public void m1(){
+			syso(this.x); = 9
+			//syso(Test.this.x); = 8
+	}
+		I.m1();
+}
+Public static void main(String[] args){
+	Test t=new Test()
+	t.m2();
+}}
+
+Ans = 9 , because current inner class object is pointed by the this keyword written within anonymous inner class
+
+Interface Interef{
+Public void m1();
+}
+Class Test{
+Int x=8;
+Public void m2(){
+	Interef I = ()->
+	{
+		int x = 9;//local variable
+		syso(this.x); = 8
+	}
+		I.m1();
+}
+Public static void main(String[] args){
+	Test t=new Test()
+	t.m2();
+}
+}
+
+This keyword in lambda expression refers to outer class expression
+
+Anonymous inner class:
+Class without name
+Can extend abstract and concrete methods
+Implements interface with many methods
+Instance variable can be declared
+Can be instantiated
+This refers to inner class object
+Best in case of handling many methods
+During compilation seperate .class file is created
+Memory will be created in heap
+
+Lambda expression:
+Function without name
+Cannot extend abstract and concrete methods
+Cannot Implement interface with many methods
+Instance variable cannot be declared
+Cannot be instantiated
+This refers to outer class object
+Best in case of handling SAM interface
+During compilation no seperate .class file is created
+Will reside in jvm(method memory)
+
+Special case:
+
+Enclosing class as well as method variables can be accessed from lambda expression, the local variables referenced in lambda expression are final or effectively final variables, it cannot be changed within or outside of the lambda expression
+
+Interface Interef{
+Public void m1();
+}
+Class Test{
+Int x=8;
+Public void m2(){
+	int y = 10;
+	Interef I = ()->
+	{
+		syso(x);=8
+		syso(y); =10
+		x = 999 	=	valid
+		y = 1000	=	invalid
+	}
+		I.m1();
+}
+Public static void main(String[] args){
+	Test t=new Test()
+	t.m2();
+}
+}
+
+
+DEFAULT methods in interfaces:
+
+Before v1.8:
+Interface interef{
+Public static final int x =10;
+Public abstract void m1();
+}
+
+Concrete method = default method
+default is the keyword and not modifier, this can be overridden and also used by the implemented class
+ 
+Interface interef{
+	default void m1(){
+		syso(“default”);
+	}
+	default void m2(){
+		syso(“default”);
+	}
+}	
+Class Test implements interef{
+	default void m2(){
+		syso(“overridden”);	
+	}
+	p s v main(String[] args){
+		Test t = new Test()
+		t.m1();
+		t.m2();
+	}
+}
+
+
+Default methods wrt multiple inheritance:
+
+Interface Left{
+	default void m1(){
+		syso(“left”);
+	}
+}
+Interface Right{
+	default void m1(){
+		syso(“right”);
+	}
+}
+Class Test implements Left,Right{
+….m1() 				=		ambiguity problem  }
+Solution
+
+Class Test implements Left,Right{
+	public void m1(){
+		Left.super.m1();
+	}
+}
+
+Default methods in interface are just dummy it does not give meaning.Default methods were introduced to provide backward compatibility for old interfaces so that they can have new methods without affecting existing code.
+
+
+
+
+Static method in interface:
+
+Just to define utility methods which is required for multiple people.Interface static method not available for implementation class
+
+Interface interef{
+	public static void m1(){
+		syso(“general utility methods”);
+	}
+}
+Class Test implements interef{
+P s v main(String[] args){
+	Test t = new Test()
+	t.m1(); = invalid
+	Test.m1() =invalid
+	Interef.m1() = valid
+}
+
+Interface static methods WRT overriding:
+Interface static method not available for implementation class so overriding possible at all.
+
+
+Valid but not overriding:
+Interface interef{
+	public static void m1(){
+		syso(“general utility methods”);
+	}
+}
+Class Test implements interef{
+P s v m1(){ }
+}
+
+Valid
+Interface interef{
+	public static void m1(){
+		syso(“general utility methods”);
+	}
+}
+Class Test implements interef{
+P v m1(){ }
+}
+
+Valid
+Interface interef{
+	public static void m1(){
+		syso(“general utility methods”);
+	}
+}
+Class Test implements interef{
+Private s v m1(){ }
+}
+
+If static methods are allowed in interface then why not main method?
+
+Class Test implements interef{
+P s v main(Sting[] args){
+	syso(“compile and run is possible directly from main”);
+}
+}
+
+Predefined Functional interfaces:
+It is available In the package java.util.function
+Predicate (common requirement)
+Function
+Consumer
+Supplier
+
+PREDICATE(I):
+
+Performs some conditional check and returns boolean output
+
+Sam method = test()
+
+Prototype:
+Interface Predicate<T>{
+boolean test(T t);
+}
+
+Examples:
+1) number greater than 10 or not
+
+Public boolean test(Integer I){
+if(I>10){
+Return true;
+}
+Else{
+Return false
+} 
+
+Predicate<Integer> p = I  -> I>10
+syso (p.test(100));
+
+2) Length of string greater than 6 or not:
+
+Predicate<String> p = a -> a.length>6;
+syso (p.test(“12345”);
+
+3) Given collection is empty or not
+
+Predicate<Collection> p = c -> c.isEmpty();
+ArrayList<Integer> al = new ArrayList<Integer>()
+syso (p.test(al));
+
+3)Predicate Joining:
+
+P1 :  number greater than 10 or not
+P2 : even number or not
+
+Not = p1.negate()
+And  = p1.and(p2)
+Or = p1.or(p2)
+
+Negate, and, or are the default methods in the predicate
+
+4)Printing names starting with ‘k’
+
+String[] names =[‘kumar’, ‘kamal’, ‘John’,’jack’]
+Predicate<String> p = s->s.chatAt(0) == ‘k’
+
+for(String s in names){ 	if(p.test(s)){
+		syso(s)
+	}
+}
+
+5)Remove null values and empty string from list
+
+String[] names =[‘kumar’,””, ‘kamal’, ‘John’,’jack’,null, “Kajal” , null]
+Predicate<String> p = s->s.length() != 0.&& s != null
+AL<String> l = new AL<String>();
+for(String s in names){ 	if(p.test(s)){
+		l.add(s)
+	}
+}
+syso(l)
+
+6) USER AUTHENTICATION:
+
+Class User{
+	String username;
+	String pass;
+	User(String username , String pass){
+		this.username = username;
+		this.pass = pass;
+	}
+}
+
+Predicate<User> p = u -> u.username,equals(“Geetha”) && u.pass.equals(“12345”) 
+//Use scanner to get input of us and pwd 
+User u1 = new User(un , pwd);
+if(p.test(u1){
+syso(“login successful”)
+}
+Else{
+syso(“invalid”);
+}
+
+7)software engineer allowed in pub or not?
+
+Class Engg{
+String name;
+String age;
+boolean gf;
+Engg( String name,String age,boolean gf){
+	this.name =name;
+	this.age=age;
+	this.gf =gf;
+}
+
+Public String toString(){
+Return name;
+}
+}
+
+Engg[] people = [new Engg(“kumar”, 42,true), new Engg(“Geetha”, 40,true),new Engg(“athi”, 23,true),new Engg(“Janis”, 12,false) ]
+
+Predicate<Engg> p = candi -> candi.age>18 && candi.gf !=false
+
+for(Engg one in people){
+If (p.test(one)){
+syso(one);
+}
+}
+
+
+FUNCTION:
+
+Function performs conditional check and returns and type of value and not always boolean
+T = input parameter, R=return type
+
+Interface Function<T,R>{
+	R apply(T t);
+} 
+
+Find length of given string
+
+Function<String,Integer> f = s -> s.length()
+syso(f.apply(“Athi”) )
+
+2) find the square:
+
+Function<Integer,Integer> f = num -> num*num
+syso( f.apply(24));
+
+3) Remove empty spaces in between the string:
+
+String s = “I am learning java 8”
+Function<String, String> f = st ->st.replaceAll(“ “,””);
+syso(f.apply(s));
+
+4) Count no. of black spaces:
+
+String s = “I am learning java 8”
+Function<String, Integer> f = st ->st.length()-st.replaceAll(“ “,””).length();
+syso(f.apply(s));
+
+5) Total monthly salary of all employees:
+
+class Employee{ 
+ String name; 
+double salary; 
+ Employee(String name,double salary) {
+ this.name=name; 
+ this.salary=salary;  
+} 
+public String toString() { 
+return name+":"+salary; 
+ } }
+
+ArrayList l= new ArrayList(); 
+//call the method which contains employee details
+populate(l); 
+Function< Arraylist<Employee>, Double> f = l->{ 
+double sum =0
+for(Employee e in l){
+Sum += e.salary
+}
+Return sum;
+}
+
+syso(f.apply(l))
+
+
+6) Increment salary by 477 if current salary is less than 3500
+
+ArrayList l= new ArrayList(); 
+ArrayList l2= new ArrayList(); 
+
+//call the method which contains employee details
+populate(l); 
+Predicate<Arraylist<Employee>> p = emp -> emp.salary<3500;
+Function< Arraylist<Employee>, Employee> f = e->{ 
+		e.salary += 477
+		return e;
+	}
+
+for(Employee e in l){
+	if(p.test(e)){
+		f.apply(e);
+		l2.add(e);
+		}
+}
+
+syso(l2);
+}
+
+7) Function chaining:
+
+f1.andThen(f2) = joins two functions = first f1 will be applied followed by f2
+f1.compose(f2)  = f2 applies first then f1
+
+8) Function<String,String> f1=s->s.toUpperCase(); 
+ Function<String,String> f2= s->s.substring(0,9);
+
+System.out.println("The Result of f1:"+f1.apply("AishwaryaAbhi"));
+System.out.println("The Result of f2:"+f2.apply("AishwaryaAbhi")); 
+System.out.println("The Result of f1.andThen(f2):"+f1.andThen(f2).apply("Aishwarya Abhi")); System.out.println("The Result of f1.compose(f2):"+f1.compose(f2).apply("Aishwarya Abhi")); 
+
+Output:
+AISHWARYAABHI
+Aishwarya
+AISHWARYA
+AISHWARYA
+
+
+Identity() = static method in function, return is same as input(rarely used)
+
+9)  Function<String,String> f = Function.identity()
+syso(f.apply(“kumar”)
+
+O/p is same as I/p
+
+CONSUMER:
+
+Consume and perform something i.e no return statement
+
+Interface Consumer<T>{
+Void accept(T t);
+}
+
+Consume<String> c =s ->syso(s)
+c.accept(“hello”);
+
+2) Movie info:
+
+Class Movie{
+String name; 
+String hero; 
+String heroine; 
+Movie(String name,String hero,String heroine){
+this.name=name; 
+this.hero=hero; 
+this.heroine=heroine; 
+}}
+ArrayList l= new ArrayList(); 
+//call the method which contains movie details
+populate(l)
+Consumer<ArrayList<Movie>> c = m -> {
+System.out.println("Movie Name:"+m.name); 
+System.out.println("Movie Hero:"+m.hero); 
+System.out.println("Movie Heroine:"+m.heroine); 
+}
+
+for(Movie m in l){
+C.accept(m)
+}
+
+3) Student info:
+
+class Student{ 
+String name;
+int marks; 
+Student(String name,int marks) { 
+this.name=name; 
+this.marks=marks; } } 
+
+ArrayList l= new ArrayList(); 
+populate(l);
+
+Predicate<Student> p = s -> s.marks >= 60
+Function f=s->{  
+int marks=s.marks; 
+if(marks>=80) { return "A[Dictinction]"; } 
+else if(marks>=60)  { return "B[First Class]";  }  
+else if(marks>=50)  { return "C[Second Class]";  } 
+else if(marks>=35)  {  return "D[Third Class]";  } 
+else { return "E[Failed]"; } 
+};  
+Consumer<Student> c=s->{  
+System.out.println("Student Name:"+s.name); 
+System.out.println("Student Marks:"+s.marks); 
+System.out.println("Student Grade:"+f.apply(s)); 
+System.out.println();  }; 
+
+for(Student s : l) { 
+	if(p.test(s)) { 
+		c.accept(s);  
+	} 
+} 
+
+4)Consumer chaining:
+
+andThen()
+
+C1.andthen(c2).andthen(c3).accept(m)
+
+5) Movie:
+
+class Movie {
+String name; 
+String result; 
+Movie(String name,String result) { 
+this.name=name; 
+this.result=result; } } 
+
+Consumer<Movie> c1 =m -> syso(m.name+”is ready to release”)
+Consumer<Movie> c2=m- >System.out.println("Movie:"+m.name+" is just Released and it is:"+m.result); 
+Consumer<Movie> c3=m- >System.out.println("Movie:"+m.name+" information storing in the database"); 
+
+Consumer c= c1.andThen(c2).andThen(c3); 
+Movie m1= new Movie("Bahubali","Hit"); 
+c.accept(m1); 
+
+SUPPLIER:
+
+Returns something never accept a value
+
+Interface Supplier<R>{
+R get()
+}
+
+1)System date:
+
+Supplier<Date> s = () -> new Date();
+syso(s.get());
+
+2) Generate OTP:
+
+Supplier<String> s = () -> {
+String otp =“” ;
+for(int i=0 ;i<6 ; I++){
+otp += (int)Math.random()*10;
+}
+Return otp;
+}
+
+syso(s.get());
+
+
+Two Arguments(BI):
+Bipredicate, Bifunction,Biconsumer
+No Bisupplier
+
+BIPREDICATE:
+
+Interface Bipredicate<T1,T2>{boolean test(T1 t1,T2 t2);}
+Sum is even or not:
+Bipredicate<Integer,Integer> bp = (a,b) -> (a+b)%2 ==0;
+syso(bp.test(3,7));
+
+And, negater is available here also
+
+BiFunction:
+
+Interface BiFunction<T1,T2,R>{R apply(T1 t1,T2 t2);}
+
+1)BiFunction<Integer,Integer,Integer> bf = (a,b) -> a*b;
+syso(bf.apply(10,20))
+
+BiConsumer:
+
+Interface BiConsumer<T1,T2>{
+	void accept(T1 t1, T2 t2);
+	Default method : andthen()
+}
+
+1)BiConsumer<String,String> bc = (a,b) -> syso(a+b)
+Bc.accept(“hi” , “world”);
+
+Primitive type functional interface:
+
+Autoboxing =>  compiler is responsible to converting primitive to objects
+
+Integer I = 10;(V1.5)
+Internal execution
+Integer I = Integer valueOf(10)  
+
+Autounboxing => Integer in = new Integer()
+			int x = in , Internally int x = in.intValue();
+
+
+Generics type parameter: AL<Integer> l = new AL<Integer>() =>valid
+				
+		AL<int> l = new AL<int>() => invalid
+
+Need:
+
+Affects performance
+int[] x = {2,4,6,8,1,3,5,7}
+			auto boxing
+1)Predicate<Integer> p = I->I%2==0
+for(var a : x){			autounboxing
+	syso(p.test(a));
+} 
+
+2)Function<Integer,Integer> f= I->I*I
+syso(f.apply(10));
+
+Solution to improve perforamance:
+
+Interface IntPredicate{
+	public boolean test(int i);
+}
+Interface LongPredicate{
+	public boolean test(long i);
+}
+Interface DoublePredicate{
+	public boolean test(double i);
+}
+
+1)IntPredicate<Integer> p = I->I%2==0
+for(var a : x){			autounboxing
+	syso(p.test(a));
+} 
+
+		return type
+2)IntFunction<Integer> f= I->I*I
+syso(f.apply(10));
+		datatype
+ToIntFunction<String> f=s->s.length
+syso(f.applyAsInt(“Hello”))
+
+InttoDoubleFunction f = I->Math.sqrt(i)
+syso(f.applyAsDouble(10));
+
+Primitive functional interfaces:
+
+1. IntFunction: can take int type as input and return any type public R apply(int i); 
+2. LongFunction: can take long type as input and return any type public R apply(long i); 
+3. DoubleFunction: can take double type as input and return any type public R apply(double d); 
+4. ToIntFunction: It can take any type as input but always returns int type public int applyAsInt(T t) 5. ToLongFunction: It can take any type as input but always returns long type public long applyAsLong(T t) 
+6. ToDoubleFunction: It can take any type as input but always returns double type public int applyAsDouble(T t) 
+7. IntToLongFunction: It can take int type as input and returns long type public long applyAsLong(int i)
+8. IntToDoubleFunction: It can take int type as input and returns long type public double applyAsDouble(int i) 
+9. LongToIntFunction: It can take long type as input and returns int type public int applyAsInt(long i) 
+10. LongToDoubleFunction: It can take long type as input and returns double type public int applyAsDouble(long i) 
+11. DoubleToIntFunction: It can take double type as input and returns int type public int applyAsInt(double i) 
+12. DoubleToLongFunction: It can take double type as input and returns long type public int applyAsLong(double i) 
+13. ToIntBiFunction:return type must be int type but inputs can be anytype public int applyAsInt(T t, U u) 
+14. ToLongBiFunction:return type must be long type but inputs can be anytype public long applyAsLong(T t, U u) 15. ToDoubleBiFunction: return type must be double type but inputs can be anytype public double applyAsDouble(T t, U u)
+
+Primitive version of consumer:
+
+IntConsumer public void accept(int value) 
+LongConsumer public void accept(long value) 
+DoubleConsumer public void accept(double value)
+4.   ObjIntConsumer public void accept(T t,int value) 
+5. ObjLongConsumer public void accept(T t,long value) 
+6. ObjDoubleConsumer public void accept(T t,double value)
+
+4,5,6 for biconsumer interface
+
+Primitive version of supplier:
+
+IntSupplier: public int getAsInt(); 
+LongSupplier :public long getAsLong() 
+DoubleSupplier: public double getAsDouble() 
+BooleanSupplier: public boolean getAsBoolean()
+
+Unary and Binary Operators:
+
+UnaryOperator:
+
+More convenient than normal Function:
+
+Here return type is the same as the datatype
+UnaryOperator <Integer> uo = a->a*a;
+syso(uo.aply(3));
+
+IntUnaryOperator <int> uo = a->a*a;(similarly long and double)
+syso(uo.applyAsInt(6))
+
+BinaryOperator:
+
+Normal function: Function<T,R>
+Bifunction: BiFunction<T1,T2,R> if all 3 are same use binary operator, which is child of bifunction
+
+BinaryOperator<String> bo= (s1,s2)->s1+s2
+syso(bo.apply(”hello”,”world”))
+
+IntBinaryOperator o = (a,b)->a*b; (similarly long, double)
+syso(o.applyAsInt(2,3));
+ 
+Method reference by double colon operator:
+
+:: - method reference and constructor reference
+
+Need:
+
+Interface interef{
+P v m1()
+}
+Class Test{
+P s v main(String[] args){
+	Interef I = ()->{syso(“implementation”);……}
+	I.m1();
+}
+}
+
+alternative for lambda expression is ::(method/constructor reference)
+
+Here implementation of m1 is m2 so instead of implementing we can just refer to m2. Both methods should have same argument types. Adv: code reusability
+
+P v m1()
+}
+Class Test{
+P s v m2(){
+	syso(“method”);
+}
+P s v main(String[] args){
+	Interef I = Test::m2
+	I.m1();
+}
+}
+
+Static: classname::method name
+Instance : Objreference :: method name
+Test t = new Test()
+t::m2
+
+Ex:
+
+Class Demo{
+Public static void main(String[] args){
+	Runnable r = ()->{
+		for(int i=0;i<10;i++){
+			syso(“child”);
+		}
+	};
+	Thread t = new Thread(r);
+	t.start();
+	for(int i=0;i<10;i++){
+		syso(“main");
+	}
+}
+}
+
+Class Demo{
+P v m1(){
+	for(int i=0;i<10;i++){
+			syso(“child”);
+	}
+}
+Public static void main(String[] args){
+	Demo d= new Demo()
+	Runnable r = d::m1
+	Thread t = new Thread(r);
+	t.start();
+	for(int i=0;i<10;i++){
+		syso(“main");
+	}
+}
+}
+
+
+Constructor Reference: Classname :: new
+
+Class Sample{
+Sample(){
+syso(“HI”);
+}
+}
+Interface interef{
+Public Sample get()
+}
+Class Demo{
+Public static void main(String[] args){
+Interef I = ()->{
+Sample s= new Sample()
+Return s
+}
+Sample s1 = I.get()
+}}
+
+Class Demo{
+Public static void main(String[] args){
+Interef I = Sample::new
+Sample s1 = I.get();
+}}
+
+STREAMS -related to collections:
+
+IO streams are different from v1.8 streams(not related to files)
+If representation of data is to be done with files then streams are involved. = java.io
+Util streams v1.8 - to process objects from collection(bulk operation)
+
+Without streams:
+AL<Integer> l = new AL<Integer()
+
+1)AL<Integer> l2 = new AL<Integer()
+
+for( Integer a: l){
+if(a%2 == 0){
+	l2.add(a);
+}}
+syso(l2);
+
+With streams:
+
+2) AL<Integer> l2 = l.stream().filter(a->a%2==0).collect(collectors.toList());
+syso(l1)
+
+
+3)Create a result list with double the values of original list
+
+Without streams:
+AL<Integer> l = new AL<Integer()
+
+1)AL<Integer> l2 = new AL<Integer()
+
+for( Integer a: l){
+l2.add(2*a)
+}
+syso(l2);
+
+With streams:
+
+2) AL<Integer> l2 = l.stream().map(a->a*2).collect(collectors.toList());
+syso(l2)
+
+
+Difference between filter() and map():
+
+Stream s = collection Stream() = stream method present in collection interface as default method
+Interface present in util.stream package
+
+Once the stream obj is created it has to be configured and processed
+
+To configure - filter or map
+Filter = based on some boolean condition filter the objects from collection. no.of objects in result can vary from original list
+Map = every object must be processed
+
+Filter mechanism:
+
+Filter elements based on boolean condition
+Can use filter method
+Ex: public Stream filter(Predicate<T> t) or lambda expression
+
+Stream s1 = c.stream().filter(a->a%2==0)
+
+Mapping mechanism:
+
+For every obj present in collection create new obj based on some function
+Use map()
+public Stream filter(Function<T,R> f) or lambda expression
+
+Stream s1 = c.stream().map(a->a*2)
+
+Process:
+
+collect() - it collects the elements from the stream and add it to the specified collection
+count() - it returns the number of elements present in stream, return type long
+sorted() - sort elements inside stream(default sorting order)
+List<Integer> l1 = l.stream().sorted().collect(collectors.toList())
+sorted(Comparator c) -  customised sorting order
+List<Integer> l1 = l.stream().sorted( (a,b)->-a.compareTo(b) or b.compareTo(a)  ).collect(collectors.toList())
+min(Comparator c) & max(Comparator c) = compulsory the input must be sorted
+forEach() - no return statement, for every elements in stream it applies some functionality
+toArray() - copy to specified array or convert elements to array
+Stream.of() - streams can be applied to any gap of values or arrays
+
+Date and Time API or JODA Time API:
+
+Date, calendar, timestamp,…..classes were available till v1.7. Performance and convenience wise not recommended.
+In java.time
+current system date:
+LocalDate date = LocalDate.now() => default format = yyyy-mm-dd
+Int dd = date.getDayOfMonth()
+Int mm = date.getMonthValue()
+Int yy = date.getYear()
+syso(“%d+%d+%d”,ddmm,yy)
+
+LocalTime time = LocalTime.now(),
+Int hr = time.getHour()
+Int m = time.getMinute()
+Int sec = time.getSecond()
+Int nanosecond = time.getNano()
+
+LocalDateTime, all methods available in local date and local time can be used
+
+LocalDateTime dt = LocalDateTime.of(yy,mm,dd,h,m,s,n)
+
+LocalDateTime dt = LocalDateTime.of(1995,05(Month.may),28,12,45)
+After 10 days what is the date, before 6 months what was the month, many cases like this has solution
+
+dt.plusMonths(6) (similarly weeks, dates)
+dt.minusMonths(6)
+
+Period: to repress quantity of time
+EX: 
+LocalDateTime bd = LocalDateTime.of(2021,12,20,12,00)
+LocalDate today = LocalDate.now()
+Period gap = Period.between(bd, today) (p.getMonths(), p.getYears(),p.getDays())
+
+Year:
+
+Year object is created using Year.of()
+isLeap()
+
+ZoneId, ZoneDateTime:
+
+ZoneId zone = ZoneId.systemDefault()
+
+ZoneId zone = ZoneId.of(“America/LosAngeles”)
+ZonedDateTime dt = ZonedDateTime.now(zone)
