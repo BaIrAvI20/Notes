@@ -109,6 +109,7 @@ Application context manages the beans created and from there we can get the bean
 Ex:  If more than one also has @Component we can use @Primary to decide on what is to be given importance with
 Spring Modules:
 
+![image](https://user-images.githubusercontent.com/69461724/158818056-f4d5af18-644c-4f86-b2a3-f0ce9687c0b1.png)
 
 
 
